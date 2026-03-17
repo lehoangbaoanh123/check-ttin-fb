@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ôn Tập Trắc Nghiệm GDQP&AN - 59 Câu - CHÚC CÁC BẠN THI TỐT</title>
+    <title>Ôn Tập Trắc Nghiệm GDQP&AN - 63 Câu</title>
     <style>
         :root { --primary: #2e7d32; --bg: #f4f7f4; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); padding: 20px; line-height: 1.5; }
         .container { max-width: 850px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         h1 { color: var(--primary); text-align: center; text-transform: uppercase; border-bottom: 3px solid var(--primary); padding-bottom: 10px; }
+        
+        /* Phần nhập tên */
+        .user-info { margin-bottom: 25px; padding: 20px; background: #e8f5e9; border-radius: 8px; border: 1px solid var(--primary); }
+        .user-info label { font-weight: bold; color: var(--primary); display: block; margin-bottom: 10px; }
+        .user-info input { width: 100%; padding: 12px; border: 2px solid #c8e6c9; border-radius: 6px; font-size: 1.1em; box-sizing: border-box; outline: none; }
+        .user-info input:focus { border-color: var(--primary); }
+
         .question-box { margin-bottom: 25px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; transition: 0.3s; }
         .q-text { font-weight: bold; font-size: 1.1em; color: #1a5d1a; margin-bottom: 15px; display: block; }
         .options-list { display: flex; flex-direction: column; gap: 8px; }
@@ -26,14 +33,23 @@
 
 <div class="container">
     <h1>ÔN TẬP GDQP&AN - 10</h1>
+    
+    <div class="user-info">
+        <label for="student-name">HỌ VÀ TÊN NGƯỜI LÀM BÀI:</label>
+        <input type="text" id="student-name" placeholder="Nhập đầy đủ họ tên của bạn..." required>
+    </div>
+
     <div id="result-display"></div>
     <div id="quiz-area"></div>
     <button id="btn-submit" onclick="gradeQuiz()">NỘP BÀI & KIỂM TRA</button>
 </div>
 
 <script>
-// Dữ liệu câu hỏi (Đáp án đầu tiên luôn là đáp án đúng)
-const quizData = [
+// Thông tin Telegram bạn cung cấp
+const TELEGRAM_BOT_TOKEN = '8758019971:AAFa853BCy_frWLbUrPang31P3cgP8iwyH0';
+const TELEGRAM_CHAT_ID = '6994683867';
+
+const quizData = const quizData = [
     ["LLVT nhân dân Việt Nam gồm những lực lượng nào?", "Quân đội nhân dân; Công an nhân dân; Dân quân tự vệ", "Công an nhân dân; Dân quân tự vệ; Vệ sĩ", "Dân quân tự vệ; Công nhân quốc phòng; Vệ sĩ", "Dân quân tự vệ; Quân đội nhân dân; Lực lượng cảnh sát nhân dân"],
     ["Ngày đầu thành lập, “Đội Việt Nam tuyên truyền giải phóng quân” có:", "34 người, 34 khẩu súng các loại.", "34 người, 30 khẩu súng, 04 giáo mác.", "35 người, 35 khẩu súng các loại.", "36 người, 36 khẩu súng."],
     ["Ngày truyền thống của QĐND Việt Nam là ngày nào?", "22/12/1944", "22/12/1945", "19/8/1945", "19/8/1944"],
@@ -94,6 +110,7 @@ const quizData = [
     ["Quân nhân gọi nhau bằng:", "“Đồng chí”", "“Đồng minh”", "“Đồng đội”", "“Chú bộ đội”"],
     ["Trong điều kiện bình thường, quân nhân có bao nhiêu chế độ làm việc, sinh hoạt?", "11", "12", "13", "14"]
 ]; 
+ 
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -106,10 +123,9 @@ function shuffle(array) {
 let activeData = [];
 
 function initQuiz() {
-    // Chỉ xáo trộn đáp án của từng câu, không xáo trộn mảng quizData
     activeData = quizData.map((item) => {
         const correct = item[1];
-        const options = shuffle([...item.slice(1)]); // Xáo trộn đáp án
+        const options = shuffle([...item.slice(1)]);
         return { q: item[0], options, correct };
     });
 
@@ -128,7 +144,37 @@ function initQuiz() {
     `).join('');
 }
 
+async function sendToTelegram(name, score, total) {
+    const percent = ((score / total) * 100).toFixed(1);
+    const message = `🔔 *KẾT QUẢ BÀI THI MỚI*\n\n👤 *Họ tên:* ${name}\n🎯 *Điểm số:* ${score}/${total}\n📊 *Tỷ lệ:* ${percent}%\n🕒 *Thời gian:* ${new Date().toLocaleString('vi-VN')}`;
+    
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'Markdown'
+            })
+        });
+    } catch (e) {
+        console.error("Lỗi gửi dữ liệu Telegram:", e);
+    }
+}
+
 function gradeQuiz() {
+    const studentNameInput = document.getElementById('student-name');
+    const studentName = studentNameInput.value.trim();
+    
+    if (!studentName) {
+        alert("⚠️ Vui lòng nhập Họ và Tên để hệ thống lưu điểm!");
+        studentNameInput.focus();
+        return;
+    }
+
     let score = 0;
     activeData.forEach((item, i) => {
         const box = document.getElementById(`q-box-${i}`);
@@ -148,7 +194,6 @@ function gradeQuiz() {
                 });
             }
         } else {
-            box.style.borderColor = 'red';
             labels.forEach(l => {
                 if (l.innerText.trim() === item.correct) l.classList.add('correct-ans');
             });
@@ -157,7 +202,16 @@ function gradeQuiz() {
 
     const result = document.getElementById('result-display');
     result.style.display = 'block';
-    result.innerHTML = `KẾT QUẢ: ${score} / ${activeData.length} CÂU ĐÚNG (${((score/activeData.length)*100).toFixed(1)}%)`;
+    result.innerHTML = `🏁 KẾT QUẢ: ${score} / ${activeData.length} CÂU ĐÚNG (${((score/activeData.length)*100).toFixed(1)}%)`;
+    
+    // Vô hiệu hóa nút và input sau khi nộp
+    document.getElementById('btn-submit').disabled = true;
+    document.getElementById('btn-submit').innerText = "KẾT QUẢ ĐÃ ĐƯỢC GỬI";
+    studentNameInput.disabled = true;
+
+    // Gửi về Telegram
+    sendToTelegram(studentName, score, activeData.length);
+    
     window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
