@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail Ultimate Alias - lehoangbaoanh123</title>
+    <style>
+        :root { --blue: #1a73e8; --green: #34a853; --red: #ea4335; }
+        body { font-family: -apple-system, sans-serif; background: #f1f3f4; display: flex; justify-content: center; padding: 15px; margin: 0; }
+        .box { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        h2 { text-align: center; color: var(--blue); font-size: 20px; margin-bottom: 20px; }
+        label { font-weight: bold; font-size: 14px; color: #555; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 10px; box-sizing: border-box; margin-top: 8px; font-size: 16px; }
+        .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        button { padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
+        .btn-main { background: var(--blue); grid-column: span 2; }
+        .btn-copy { background: var(--green); }
+        .btn-save { background: var(--red); }
+        button:active { transform: scale(0.97); }
+        textarea { height: 300px; font-family: 'Courier New', monospace; font-size: 12px; background: #fafafa; border-style: dashed; }
+        .status { text-align: center; margin-top: 10px; font-weight: bold; color: #444; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Gmail Ultimate Alias </h2>
+    <label>Nhập Gmail chính:</label>
+    <input type="text" id="email" value="baoanh20100505@gmail.com">
+    
+    <button class="btn-main" onclick="run()">TẠO TẤT CẢ BIẾN THỂ (VÉT CẠN)</button>
+    
+    <div class="btns">
+        <button class="btn-copy" onclick="copy()">SAO CHÉP</button>
+        <button class="btn-save" onclick="save()">LƯU FILE .TXT</button>
+    </div>
+
+    <div id="status" class="status">Sẵn sàng</div>
+    <textarea id="output" readonly placeholder="Kết quả hiện ở đây..."></textarea>
+</div>
+
+<script>
+    function run() {
+        const input = document.getElementById('email').value.trim();
+        if(!input.includes('@')) return alert("Hãy nhập đúng Gmail!");
+        
+        const username = input.split('@')[0];
+        document.getElementById('status').innerText = "Đang xử lý tổ hợp... đợi xíu!";
+        
+        // Thuật toán đệ quy tạo 2^(n-1) tổ hợp dấu chấm
+        function generate(str) {
+            if (str.length <= 1) return [str];
+            const first = str[0];
+            const rest = str.substring(1);
+            const subs = generate(rest);
+            let res = [];
+            subs.forEach(s => {
+                res.push(first + s);      // Không chấm
+                res.push(first + "." + s); // Có chấm
+            });
+            return res;
+        }
+
+        setTimeout(() => {
+            const usernames = generate(username);
+            let final = [];
+            
+            usernames.forEach(u => {
+                final.push(u + "@gmail.com");
+                final.push(u + "@googlemail.com"); // Thêm đuôi googlemail (Gmail vẫn nhận)
+            });
+
+            document.getElementById('output').value = final.join('\n');
+            document.getElementById('status').innerText = "Xong! Đã tạo " + final.length.toLocaleString() + " email.";
+        }, 100);
+    }
+
+    function copy() {
+        const area = document.getElementById('output');
+        if(!area.value) return;
+        area.select();
+        navigator.clipboard.writeText(area.value);
+        alert("Đã sao chép tất cả!");
+    }
+
+    function save() {
+        const content = document.getElementById('output').value;
+        if(!content) return;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'full_gmail_alias.txt';
+        a.click();
+    }
+</script>
+
+</body>
+</html>
