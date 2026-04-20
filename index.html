@@ -9,69 +9,66 @@
 body {
     font-family: Arial;
     background: linear-gradient(135deg,#74ebd5,#ACB6E5);
-    margin: 0;
-    padding: 20px;
+    margin:0;
+    padding:20px;
 }
 
 .container {
-    max-width: 900px;
-    margin: auto;
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
 }
 
 h1 {
-    text-align: center;
-}
-
-input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+    text-align:center;
 }
 
 .question {
-    margin-bottom: 20px;
-    padding: 15px;
-    border-radius: 10px;
-    background: #f8f9fa;
+    margin:20px 0;
+    padding:15px;
+    border-radius:10px;
+    background:#f8f9fa;
+    transition:0.3s;
 }
 
-.options label {
-    display: block;
-    padding: 10px;
-    border-radius: 6px;
-    cursor: pointer;
+.question:hover {
+    background:#e3f2fd;
 }
 
-.options label:hover {
-    background: #e3f2fd;
+label {
+    display:block;
+    padding:8px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+label:hover {
+    background:#d0ebff;
 }
 
 button {
-    width: 100%;
-    padding: 15px;
-    background: #27ae60;
-    color: white;
-    font-size: 18px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    background:#28a745;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
 }
 
 button:hover {
-    background: #219150;
+    background:#218838;
 }
 
 #result {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
+    margin-top:20px;
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
 }
 </style>
 </head>
@@ -79,189 +76,111 @@ button:hover {
 <body>
 
 <div class="container">
-    <h1>ĐỀ ÔN THI QP-AN</h1>
+<h1>ÔN THI QP-AN</h1>
 
-    <input type="text" id="username" placeholder="Nhập tên...">
+<div id="quiz"></div>
 
-    <div id="quiz"></div>
+<button onclick="check()">NỘP BÀI</button>
 
-    <button onclick="checkAnswers()">NỘP BÀI</button>
-
-    <div id="result"></div>
+<div id="result"></div>
 </div>
 
 <script>
-const botToken = "YOUR_BOT_TOKEN";
-const chatId = "YOUR_CHAT_ID";
-
-// ================= DATA FULL =================
 const data = [
-{ q: "1. Luật phòng chống ma túy, bao gồm:", ops: ["8 chương, 55 điều.", "7 chương, 21 điều.", "9 chương, 55 điều.", "7 chương, 46 điều."] },
+{ q:"1. Luật phòng chống ma túy, bao gồm:", ops:["8 chương, 55 điều.","7 chương, 21 điều.","9 chương, 55 điều.","7 chương, 46 điều."] },
+{ q:"2. Chất gây nghiện là:", ops:["Chất kích thích hoặc ức chế thần kinh, dễ gây nghiện.","Chất gây ảo giác nhưng không nghiện.","Chất giảm đau.","Chất hỗ trợ tiêu viêm."] },
+{ q:"3. Chất kích thích hoặc ức chế thần kinh gây nghiện gọi là:", ops:["chất hướng thần.","chất gây nghiện.","chất chống viêm.","chất an thần."] },
+{ q:"4. Loại cây không chứa ma túy:", ops:["Cây xuyên tâm liên.","Cây Côca.","Cây thuốc phiện.","Cây cần sa."] },
+{ q:"5. Hành vi không bị cấm:", ops:["Giáo dục phòng chống ma túy.","Trồng cây ma túy.","Vận chuyển ma túy.","Mua bán ma túy."] },
 
-{ q: "2. Chất gây nghiện là:", ops: ["Chất kích thích hoặc ức chế thần kinh, dễ gây tình trạng nghiện với người sử dụng.", "Chất kích thích hoặc ức chế thần kinh, gây ảo giác nhưng không gây tình trạng nghiện.", "Chất an thần, hỗ trợ giảm đau nhức xương khớp, dùng quen sẽ gây tình trạng nghiện.", "Chất hỗ trợ tiêu viêm, giảm đau, hạ sốt, nếu sử dụng nhiều lần có thể dẫn đến nghiện."] },
+{ q:"6. Hành vi không bị cấm:", ops:["Tuyên truyền chống ma túy.","Vận chuyển ma túy.","Trồng cần sa.","Lôi kéo sử dụng."] },
+{ q:"7. Trách nhiệm cá nhân:", ops:["Cung cấp thông tin.","Cản trở xét nghiệm.","Cản trở phòng chống.","Lôi kéo sử dụng."] },
+{ q:"8. Tình huống trồng thuốc phiện là:", ops:["Trồng cây ma túy.","Sản xuất ma túy.","Chống xét nghiệm.","Lôi kéo sử dụng."] },
+{ q:"9. Quá trình nghiện:", ops:["Sử dụng→lạm dụng→lệ thuộc.","Sai thứ tự.","Sai.","Sai."] },
+{ q:"10. Tác hại bản thân:", ops:["Hại sức khỏe.","Giảm lao động.","Giảm vốn.","Xã hội xấu."] },
 
-{ q: "3. Chất kích thích hoặc ức chế thần kinh hoặc gây ảo giác, nếu sử dụng nhiều lần có thể dẫn tới tình trạng nghiện đối với người sử dụng được gọi là:", ops: ["chất hướng thần.", "chất gây nghiện.", "chất chống viêm.", "chất an thần."] },
+{ q:"11. Tác hại kinh tế:", ops:["Giảm đầu tư.","Hại sức khỏe.","Gia đình tan.","Xã hội xấu."] },
+{ q:"12. Nguyên nhân chủ quan:", ops:["Tò mò, chơi trội.","Gia đình.","Tuyên truyền.","Luật."] },
+{ q:"13. Không đúng dấu hiệu:", ops:["Khỏe mạnh.","Toát mồ hôi.","Hoảng tưởng.","Giấu ma túy."] },
+{ q:"14. Xử lý:", ops:["Báo công an.","Che giấu.","Chất vấn.","Không quan tâm."] },
+{ q:"15. Bị cấm GT:", ops:["Đua xe.","Đội mũ.","Bật đèn.","Đèn đúng."] },
 
-{ q: "4. Loại cây nào dưới đây không có chứa chất ma túy?", ops: ["Cây xuyên tâm liên.", "Cây Côca.", "Cây thuốc phiện.", "Cây cần sa."] },
+{ q:"16. Không đúng nguyên tắc:", ops:["Không bật đèn.","Đi bên phải.","Đúng làn.","Biển báo."] },
+{ q:"17. Người đi bộ:", ops:["Giảm tốc nhường.","Tăng tốc.","Dừng chờ.","Không nhường."] },
+{ q:"18. Xe bị vượt:", ops:["Giảm tốc.","Bật đèn.","Tăng tốc trái.","Tăng tốc phải."] },
+{ q:"19. Chở thêm:", ops:["Áp giải người vi phạm.","2 dưới 18.","2 trên 16.","1 lớn 1 nhỏ."] },
+{ q:"20. Người lái xe:", ops:["Đội mũ.","Đi sai đường.","Sai làn.","Không cài quai."] },
 
-{ q: "5. Hành vi nào dưới đây không bị nghiêm cấm trong phòng, chống ma túy?", ops: ["Giáo dục pháp luật về phòng, chống ma túy và lối sống lành mạnh cho học sinh.", "Trồng cây có chứa chất ma túy, hướng dẫn trồng cây có chứa chất ma túy.", "Cưỡng bức, lôi kéo người khác sử dụng trái phép chất ma túy.", "Sản xuất, tàng trữ, vận chuyển, mua bán, trao đổi trái phép chất ma túy."] },
+{ q:"21. Người đi bộ không:", ops:["Đu bám xe.","Đi vỉa hè.","Qua vạch.","Tuân thủ."] },
+{ q:"22. Ai vi phạm:", ops:["Bạn P.","Lái đò.","Cả hai.","Không ai."] },
+{ q:"23. Không trách nhiệm HS:", ops:["Ban hành luật.","Tuân thủ.","Giúp đỡ.","Vận động."] },
+{ q:"24. Nội dung:", ops:["An ninh QG.","Bảo vệ AN.","Trật tự.","Bảo đảm."] },
+{ q:"25. Phòng chống AN:", ops:["Bảo vệ ANQG.","ANQG.","TTXH.","Bảo đảm."] },
 
-{ q: "6. Hành vi nào dưới đây không bị nghiêm cấm trong phòng, chống ma túy?", ops: ["Bạn T tham gia công tác tuyên truyền về tác hại của ma túy.", "Anh K tham gia vận chuyển, tàng trữ trái phép chất ma túy.", "Bà S trồng cây cần sa trong vườn xen lẫn các cây ăn quả.", "Anh P lôi kéo em C tham gia sử dụng trái phép chất ma túy."] },
+{ q:"26. Xã hội bình yên:", ops:["TTXH.","ANQG.","Bảo vệ.","Bảo đảm."] },
+{ q:"27. Chống tội phạm:", ops:["Bảo đảm TTXH.","ANQG.","Bảo vệ.","TTXH."] },
+{ q:"28. Không bao gồm:", ops:["An ninh tư tưởng.","Trật tự.","Chống tội phạm.","Thiên tai."] },
+{ q:"29. Không gồm:", ops:["Quyền trẻ em.","Chính trị.","Con người.","Kinh tế."] },
+{ q:"30. Trách nhiệm Đảng:", ops:["Lãnh đạo tuyệt đối.","Nòng cốt.","Tố cáo.","Cung cấp."] },
 
-{ q: "7. Trong việc phòng, chống ma túy, các cá nhân có trách nhiệm như thế nào?", ops: ["Cung cấp kịp thời thông tin về tội phạm, tệ nạn ma túy.", "Cản trở hoặc chống lại việc xét nghiệm chất ma túy.", "Cản trở người tham gia phòng, chống chất ma túy.", "Lôi kéo người khác sử dụng trái phép chất ma túy."] },
+{ q:"31. Quyết định chiến tranh:", ops:["Quốc hội.","Chính phủ.","MTTQ.","Tòa án."] },
+{ q:"32. Thi hành Hiến pháp:", ops:["Chính phủ.","Quốc hội.","MTTQ.","Tòa án."] },
+{ q:"33. LLVT:", ops:["Nòng cốt.","Xung kích.","Lãnh đạo.","Tuyệt đối."] },
+{ q:"34. Công dân:", ops:["Chấp hành.","Bảo vệ nội bộ.","Thi hành.","Quyết định."] },
+{ q:"35. Không phải:", ops:["Thi hành HP.","Chấp hành.","Tố cáo.","Cộng tác."] },
 
-{ q: "8. Hành vi vi phạm pháp luật nào được đề cập đến trong tình huống sau? Tình huống: Nhà bạn G ở trên núi, rất xa trạm y tế. Bố mẹ G trồng mấy cây thuốc phiện để làm thuốc uống khi nhà có người nhà đau bụng.", ops: ["Trồng cây có chứa chất ma túy (cây thuốc phiện).", "Sản xuất, tàng trữ, vận chuyển trái phép chất ma túy.", "Chống lại hoặc cản trở việc xét nghiệm chất ma túy.", "Cưỡng bức, lôi kéo người khác sử dụng chất ma túy."] },
+{ q:"36. HS:", ops:["Gương mẫu.","Bảo vệ nội bộ.","Thi hành.","Quyết định."] },
+{ q:"37. Biên giới:", ops:["Kiểm tra mốc.","Bảo vệ.","Rác.","Dọn biển."] },
+{ q:"38. Tố cáo:", ops:["Công dân.","Quốc hội.","Chính phủ.","LLVT."] },
+{ q:"39. Không gian:", ops:["Không gian mạng.","Mạng.","AN mạng.","Bảo vệ."] },
+{ q:"40. Mạng:", ops:["Mạng.","Không gian.","AN.","Bảo vệ."] },
 
-{ q: "9. Quá trình nghiện ma túy thường trải qua những giai đoạn nào?", ops: ["Sử dụng ma túy => lạm dụng ma túy => lệ thuộc ma túy.", "Lạm dụng ma túy => sử dụng ma túy => lệ thuộc ma túy.", "Lệ thuộc ma túy => sử dụng ma túy => lạm dụng ma túy.", "Sử dụng ma túy => lệ thuộc ma túy => lạm dụng ma túy."] },
+{ q:"41. AN mạng:", ops:["Không gây hại.","Mạng.","Không gian.","Bảo vệ."] },
+{ q:"42. Bị cấm:", ops:["Xuyên tạc.","Đăng ảnh.","Tra cứu.","Tương tác."] },
+{ q:"43. Không cấm:", ops:["Tra cứu.","Xuyên tạc.","Bịa đặt.","Đánh bạc."] },
+{ q:"44. Trẻ em:", ops:["Được bảo vệ.","Kích động.","Tấn công.","Đánh bạc."] },
+{ q:"45. Không đúng:", ops:["Tin giả.","An toàn.","Pháp luật.","Lành mạnh."] },
 
-{ q: "10. Ma túy gây tác hại như thế nào đối với bản thân người nghiện?", ops: ["Gây tổn hại về sức khỏe thể chất và tinh thần.", "Lực lượng lao động của xã hội bị suy giảm.", "Nguồn vốn đầu tư nước ngoài bị suy giảm.", "Xã hội kém an toàn do phát sinh nhiều tệ nạn."] },
+{ q:"46. Không phải cá nhân:", ops:["Sở thích.","Họ tên.","Ngày sinh.","Nghề."] },
+{ q:"47. Không bí mật:", ops:["Nghề.","Y tế.","Thẻ.","Thuế."] },
+{ q:"48. Bảo mật:", ops:["Chống virus.","Chia sẻ.","Mật khẩu yếu.","Wifi công cộng."] },
+{ q:"49. Không vi phạm:", ops:["H + chị.","H+M.","chị+M.","3 người."] },
+{ q:"50. Vi phạm:", ops:["A.","V.","Cả hai.","Không ai."] },
 
-{ q: "11. Ma túy gây tác hại như thế nào đối với nền kinh tế?", ops: ["Nguồn vốn đầu tư nước ngoài bị suy giảm.", "Gây tổn hại về sức khỏe thể chất và tinh thần.", "Hạnh phúc gia đình bị rạn nứt, dễ tan vỡ.", "Xã hội kém an toàn do phát sinh nhiều tệ nạn."] },
+{ q:"51. Vi phạm:", ops:["Đua xe.","Đội mũ.","Đèn đỏ.","Đúng làn."] },
+{ q:"52. Nên:", ops:["Đội mũ.","Vượt đèn.","Lạng lách.","Điện thoại."] },
+{ q:"53. Mục đích:", ops:["Không hại AN.","Chơi.","Chia sẻ.","Tấn công."] },
+{ q:"54. HS:", ops:["Học & tuân luật.","Bỏ học.","Vi phạm.","Phá hoại."] },
+{ q:"55. Bảo mật:", ops:["Mật khẩu mạnh.","Ngày sinh.","Chia sẻ.","Không đăng xuất."] },
 
-{ q: "12. Một trong những nguyên nhân chủ quan dẫn đến nghiện ma túy là do:", ops: ["sự tò mò, “chơi trội”, lối sống buông thả, thực dụng.", "thiếu sự quan tâm, giáo dục của gia đình, người thân.", "công tác tuyên truyền về tác hại của ma túy chưa hiệu quả.", "chế tài xử phạt của nhà nước còn nhẹ, chưa đủ sức răn đe."] },
+{ q:"56. Không đúng:", ops:["Tin giả.","An toàn.","Pháp luật.","Lành mạnh."] },
+{ q:"57. Không phải:", ops:["Sở thích.","Họ tên.","Ngày sinh.","Nghề."] },
+{ q:"58. Không bí mật:", ops:["Nghề.","Y tế.","Thẻ.","Thuế."] },
+{ q:"59. Bảo mật:", ops:["Chống virus.","Chia sẻ.","Mật khẩu yếu.","Wifi."] },
+{ q:"60. Không vi phạm:", ops:["H + chị.","H+M.","chị+M.","3 người."] },
+{ q:"61. Vi phạm:", ops:["A.","V.","Cả hai.","Không ai."] }
+];
 
-{ q: "13. Nội dung nào dưới đây không phản ánh đúng dấu hiệu nhận biết học sinh nghiện ma túy?", ops: ["Cơ thể đầy đặn, khỏe mạnh, thần thái tươi tỉnh, học lực tốt.", "Bị toát mồ hôi, ngáp vặt, ngủ gật, da xanh tái, nổi da gà.", "Hay lo sợ, hoảng tưởng, tính cách thay đổi thất thường.", "Cất giấu chất ma túy hoặc dụng cụ sử dụng chất ma túy."] },
-
-{ q: "14. Khi phát hiện người thân/bạn bè tàng trữ và sử dụng trái phép chất ma túy, em nên lựa chọn cách ứng xử nào dưới đây?", ops: ["Nhanh chóng báo thông tin tới cơ quan chức năng gần nhất.", "Im lặng và tuyệt đối che dấu thông tin cho người thân, bạn bè.", "Chất vấn người thân, bạn bè; thông báo cho mọi người xung quanh.", "Im lặng và không quan tâm vì việc đó không ảnh hưởng gì tới mình."] },
-
-{ q: "15. Hành vi nào dưới đây bị nghiêm cấm khi tham gia giao thông đường bộ?", ops: ["Đua xe, cổ vũ đua xe, tổ chức đua xe trái phép, lạng lách.", "Đội mũ bảo hiểm khi điều khiển xe mô tô, xe gắn máy.", "Bật đèn tín hiệu khi chuyển hướng, chuyển làn đường.", "Lắp đặt, sử dụng còi, đèn đúng với thiết kế của nhà sản xuất."] },
-
-{ q: "16. Nội dung nào dưới đây không phản ánh đúng nguyên tắc chung khi tham gia giao thông đường bộ ở Việt Nam?", ops: ["Không bật đèn tín hiệu khi chuyển làn đường.", "Đi về bên phải theo chiều đi của mình.", "Đi đúng làn đường, phần đường quy định.", "Chấp hành hệ thống báo hiệu đường bộ."] },
-
-{ q: "17. Tại nơi có hoặc không có vạch kẻ đường dành cho người đi bộ, người điều khiển phương tiện phải:", ops: ["quan sát, giảm tốc độ và nhường đường cho người đi bộ.", "tăng tốc độ và nhường đường cho xe của người khuyết tật.", "dừng lại, đợi xe của người khuyết tật đi qua mới được di chuyển.", "tăng tốc độ, không cần nhường đường cho người đi bộ, người khuyết tật."] },
-
-{ q: "18. Theo quy định của Luật giao thông đường bộ: khi vượt xe, xe bị vượt phải:", ops: ["chú ý quan sát, giảm tốc độ và nhường đường.", "bật đèn tín hiệu và đảm bảo các điều kiện an toàn.", "lập tức tăng tốc và di chuyển về phía bên trái.", "nhanh chóng tăng tốc và di chuyển về phía bên phải."] },
-
-{ q: "19. Người điều khiển xe mô tô hai bánh, xe gắn máy chỉ được chở một người, trừ trường hợp nào dưới đây?", ops: ["Áp giải người có hành vi vi phạm pháp luật.", "Chở hai người dưới 18 tuổi.", "Chở hai người trên 16 tuổi.", "Chở một người lớn và một trẻ em dưới 16 tuổi."] },
-
-{ q: "20. Người điều khiển xe mô tô hai bánh, xe mô tô ba bánh, xe gắn máy, xe đạp máy phải:", ops: ["đội mũ bảo hiểm có cài quai đúng quy cách.", "đi xe vào phần đường dành cho người đi bộ.", "đi xe vào phần đường dành cho phương tiện khác.", "đội mũ bảo hiểm nhưng không cần cài quai mũ."] },
-
-{ q: "21. Khi tham gia giao thông, người đi bộ không được thực hiện hành vi nào dưới đây?", ops: ["Đu bám vào phương tiện giao thông đang chạy.", "Đi trên hè phố, lề đường, đi sát mép đường.", "Qua đường ở những nơi có vạch kẻ đường.", "Tuân thủ hiệu lệnh của biển báo hiệu."] },
-
-{ q: "22. Trong tình huống sau, những chủ thể nào đã vi phạm quy định về trật tự, an toàn giao thông thủy nội địa? (Tình huống về bạn P đi đò không mặc áo phao)", ops: ["Bạn P.", "Bác lái đò.", "Bác lái đò và bạn P.", "Không có nhân vật nào."] },
-
-{ q: "23. Trong phòng, chống vi phạm an toàn giao thông, học sinh không có trách nhiệm nào dưới đây?", ops: ["Ban hành các chính sách, cơ chế xử lý hành vi vi phạm luật giao thông.", "Chủ động học tập và tự giác, gương mẫu tuân thủ quy định của pháp luật.", "Giúp đỡ người khác tham gia giao thông an toàn, đúng quy định pháp luật.", "Vận động người thân thực hiện pháp luật về trật tự, an toàn giao thông."] },
-
-{ q: "24. Sự ổn định, phát triển bền vững của chế độ XHCN và nhà nước... là nội dung của:", ops: ["An ninh quốc gia.", "Bảo vệ an ninh quốc gia.", "Trật tự, an toàn xã hội.", "Bảo đảm trật tự, an toàn xã hội."] },
-
-{ q: "25. ... là phòng ngừa, phát hiện, đấu tranh làm thất bại các hoạt động xâm phạm an ninh quốc gia:", ops: ["Bảo vệ an ninh quốc gia.", "An ninh quốc gia.", "Trật tự, an toàn xã hội.", "Bảo đảm trật tự xã hội."] },
-
-{ q: "26. Trạng thái xã hội bình yên... là:", ops: ["Trật tự, an toàn xã hội.", "An ninh quốc gia.", "Bảo vệ an ninh quốc gia.", "Bảo đảm trật tự xã hội."] },
-
-{ q: "27. ... là phòng ngừa, phát hiện, đấu tranh chống tội phạm:", ops: ["Bảo đảm trật tự, an toàn xã hội.", "An ninh quốc gia.", "Bảo vệ an ninh quốc gia.", "Trật tự, an toàn xã hội."] },
-
-{ q: "28. Đảm bảo trật tự, an toàn xã hội không bao gồm:", ops: ["Bảo vệ an ninh tư tưởng - văn hoá, an ninh dân tộc, tôn giáo.", "Giữ gìn trật tự công cộng.", "Đấu tranh phòng chống tội phạm.", "Phòng chống thiên tai, dịch bệnh."] },
-
-{ q: "29. Bảo vệ an ninh quốc gia không bao gồm:", ops: ["Bảo vệ quyền trẻ em.", "Bảo vệ an ninh chính trị.", "Bảo vệ an ninh con người.", "Bảo vệ an ninh kinh tế."] },
-
-{ q: "30. Trách nhiệm của Đảng trong bảo vệ an ninh quốc gia:", ops: ["Lãnh đạo trực tiếp, tuyệt đối.", "Giữ vai trò nòng cốt.", "Tố cáo hành vi vi phạm.", "Cung cấp thông tin."] },
-
-{ q: "31. Cơ quan quyết định chiến tranh và hoà bình:", ops: ["Quốc hội.", "Chính phủ.", "Mặt trận Tổ quốc.", "Tòa án."] },
-
-{ q: "32. Cơ quan tổ chức thi hành Hiến pháp:", ops: ["Chính phủ.", "Quốc hội.", "Mặt trận Tổ quốc.", "Tòa án."] },
-
-{ q: "33. LLVT nhân dân giữ vai trò:", ops: ["nòng cốt.", "xung kích.", "lãnh đạo trực tiếp.", "lãnh đạo tuyệt đối."] },
-
-{ q: "34. Trách nhiệm công dân:", ops: ["Chấp hành chủ trương của Đảng.", "Bảo vệ an ninh chính trị nội bộ.", "Thi hành Hiến pháp.", "Quyết định chiến tranh."] },
-
-{ q: "35. Không phải trách nhiệm công dân:", ops: ["Tổ chức thi hành Hiến pháp.", "Chấp hành chủ trương.", "Tố cáo hành vi vi phạm.", "Cộng tác với công an."] },
-
-{ q: "36. Trách nhiệm học sinh:", ops: ["Gương mẫu thực hiện nội quy nhà trường.", "Bảo vệ an ninh chính trị nội bộ.", "Thi hành Hiến pháp.", "Quyết định chiến tranh."] },
-
-{ q: "37. Hoạt động biên giới:", ops: ["Kiểm tra cột mốc biên giới.", "Bảo vệ lãnh đạo.", "Tuyên truyền rác thải.", "Dọn rác biển."] },
-
-{ q: "38. Tố cáo vi phạm là trách nhiệm của:", ops: ["công dân.", "Quốc hội.", "Chính phủ.", "lực lượng vũ trang."] },
-
-{ q: "39. Môi trường thông tin mạng là:", ops: ["Không gian mạng.", "Mạng.", "An ninh mạng.", "Bảo vệ an ninh mạng."] },
-
-{ q: "40. ... là mạng lưới kết nối CNTT:", ops: ["mạng.", "không gian mạng.", "an ninh mạng.", "bảo vệ an ninh mạng."] },
-
-{ q: "41. Không gây phương hại ANQG là:", ops: ["An ninh mạng.", "Mạng.", "Không gian mạng.", "Bảo vệ an ninh mạng."] },
-
-{ q: "42. Hành vi bị cấm:", ops: ["Xuyên tạc lịch sử.", "Đăng ảnh cá nhân.", "Tra cứu thông tin.", "Tương tác."] },
-
-{ q: "43. Không bị cấm:", ops: ["Tra cứu thông tin.", "Xuyên tạc lịch sử.", "Bịa đặt thông tin.", "Đánh bạc."] },
-
-{ q: "44. Trẻ em có quyền:", ops: ["được bảo vệ, tiếp cận thông tin.", "kích động phạm tội.", "tấn công mạng.", "đánh bạc."] },
-
-{ q: "45. Không đúng:", ops: ["Phát tán thông tin giả.", "An toàn bảo mật.", "Tôn trọng pháp luật.", "Lành mạnh."] },
-
-{ q: "46. Không phải thông tin cá nhân:", ops: ["Sở thích.", "Họ tên.", "Ngày sinh.", "Nghề nghiệp."] },
-
-{ q: "47. Không phải bí mật cá nhân:", ops: ["Nghề nghiệp.", "Hồ sơ y tế.", "Số thẻ tín dụng.", "Hồ sơ thuế."] },
-
-{ q: "48. Bảo mật thông tin:", ops: ["Sử dụng phần mềm chống virus.", "Chia sẻ thông tin.", "Mật khẩu dễ.", "Wifi công cộng."] },
-
-{ q: "49. Ai không vi phạm:", ops: ["Bạn H và chị gái.", "H và M.", "Chị gái và M.", "Cả ba."] },
-
-{ q: "50. Ai vi phạm:", ops: ["Bạn A.", "Bạn V.", "Cả hai.", "Không ai."] },
-
-{ q: "51. Vi phạm giao thông:", ops: ["Đua xe trái phép.", "Đội mũ.", "Dừng đèn đỏ.", "Đi đúng làn."] },
-
-{ q: "52. Hành vi nên làm:", ops: ["Đội mũ bảo hiểm.", "Vượt đèn đỏ.", "Lạng lách.", "Dùng điện thoại."] },
-
-{ q: "53. Bảo vệ an ninh mạng nhằm:", ops: ["Không gây phương hại ANQG.", "Chơi game.", "Chia sẻ info.", "Tấn công."] },
-
-{ q: "54. Trách nhiệm HS:", ops: ["Học tập và tuân thủ pháp luật.", "Bỏ học.", "Vi phạm nội quy.", "Phá hoại."] },
-
-{ q: "55. Bảo mật tài khoản:", ops: ["Đặt mật khẩu mạnh.", "Ngày sinh.", "Chia sẻ.", "Không đăng xuất."] },
-
-{ q: "56. Không đúng:", ops: ["Phát tán thông tin giả.", "An toàn bảo mật.", "Tôn trọng pháp luật.", "Lành mạnh."] },
-
-{ q: "57. Không phải thông tin cá nhân:", ops: ["Sở thích.", "Họ tên.", "Ngày sinh.", "Nghề nghiệp."] },
-
-{ q: "58. Không phải bí mật:", ops: ["Nghề nghiệp.", "Hồ sơ y tế.", "Thẻ tín dụng.", "Hồ sơ thuế."] },
-
-{ q: "59. Bảo mật:", ops: ["Dùng phần mềm chống virus.", "Chia sẻ info.", "Mật khẩu yếu.", "Wifi công cộng."] },
-
-{ q: "60. Không vi phạm:", ops: ["Bạn H và chị gái.", "H và M.", "Chị gái và M.", "Cả ba."] },
-
-{ q: "61. Ai vi phạm:", ops: ["Bạn A.", "Bạn V.", "Cả hai.", "Không ai."] }
-
-// ================= RENDER =================
 const quiz = document.getElementById("quiz");
-const correct = [];
-
-function shuffle(a){ return a.sort(()=>Math.random()-0.5); }
+let answers = [];
 
 data.forEach((item,i)=>{
-    correct.push(item.ops[0]);
-    let ops = shuffle([...item.ops]);
-
-    let html = `<div class="question">
-    <b>${item.q}</b>
-    <div class="options">`;
-
-    ops.forEach(op=>{
+    answers.push(item.ops[0]);
+    let html = `<div class="question"><b>${item.q}</b>`;
+    item.ops.sort(()=>Math.random()-0.5).forEach(op=>{
         html += `<label><input type="radio" name="q${i}" value="${op}"> ${op}</label>`;
     });
-
-    html += `</div></div>`;
+    html += "</div>";
     quiz.innerHTML += html;
 });
 
-// ================= CHECK =================
-function checkAnswers(){
-    let name = document.getElementById("username").value.trim();
-    if(!name) return alert("Nhập tên!");
-
-    let score = 0;
-
+function check(){
+    let score=0;
     data.forEach((q,i)=>{
-        let pick = document.querySelector(`input[name="q${i}"]:checked`);
-        if(pick && pick.value === correct[i]) score++;
+        let s=document.querySelector(`input[name=q${i}]:checked`);
+        if(s && s.value===answers[i]) score++;
     });
-
-    document.getElementById("result").innerHTML = `Điểm: ${score}/${data.length}`;
-
-    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-            chat_id:chatId,
-            text:`${name} được ${score}/${data.length}`
-        })
-    });
+    document.getElementById("result").innerText="Điểm: "+score+"/"+data.length;
 }
 </script>
 
